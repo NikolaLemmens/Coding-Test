@@ -43,7 +43,7 @@ public class SceneThreeAnimation : MonoBehaviour
     public void OnRestartButtonClick()
     {
         StartCoroutine(SwitchScene(0));
-        UIController.GetInstance().SwopTimelineUI();
+        UIController.GetInstance().SwopTimeline();
     }
 
     private IEnumerator SwitchScene(int sceneToLoad)

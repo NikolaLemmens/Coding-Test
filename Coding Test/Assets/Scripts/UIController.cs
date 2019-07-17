@@ -17,6 +17,11 @@ public class UIController : MonoBehaviour
         return instance;
     }
 
+    public bool animationHasFinished;
+    private bool sceneSwitch;
+
+    private IEnumerator lastTimelineSwop;
+
     void Awake()
     {
         if (instance == null)
@@ -35,28 +40,44 @@ public class UIController : MonoBehaviour
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         Debug.Log("currentSceneIndex: " + currentSceneIndex);
+
+        // Make sure the current scene animation is finished. 
+        if (!animationHasFinished)
+            return;
+        // Make sure the scene switch is called once.
+        if (sceneSwitch)
+            return;
+        sceneSwitch = true;
+        // Extra check to make sure only one coroutine at a time is called.
+        if (lastTimelineSwop != null)
+            return;
+
         switch (currentSceneIndex)
         {
             case 0:
                 OnSwitchToScene(1);
-                StartCoroutine(ChangeTimelineUI(0,1));
+                lastTimelineSwop = TimelineSwop(0, 1);
+                StartCoroutine(lastTimelineSwop);
                 break;
             case 1:
                 OnSwitchToScene(2);
+                lastTimelineSwop = TimelineSwop(1, 2);
+                StartCoroutine(lastTimelineSwop);
                 break;
             case 2:
                 OnSwitchToScene(0);
-                StartCoroutine(ChangeTimelineUI(2,0));
+                lastTimelineSwop = TimelineSwop(2, 0);
+                StartCoroutine(lastTimelineSwop);
                 break;
         }
     }
 
-    public void SwopTimelineUI()
+    public void SwopTimeline()
     {
-        StartCoroutine(ChangeTimelineUI(2, 0));
+        StartCoroutine(TimelineSwop(2, 0));
     }
 
-    public IEnumerator ChangeTimelineUI(int currentScene,int nextScene)
+    public IEnumerator TimelineSwop(int currentScene,int nextScene)
     {
         while(SceneManager.GetActiveScene().buildIndex == currentScene)
         {
@@ -74,6 +95,11 @@ public class UIController : MonoBehaviour
                 timelineButtonImages[i].gameObject.GetComponent<Animation>().enabled = false;
             }
         }
+
+        animationHasFinished = false;
+        sceneSwitch = false;
+
+        lastTimelineSwop = null;
     }
 
 }

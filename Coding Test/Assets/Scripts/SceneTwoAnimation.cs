@@ -2,113 +2,83 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class SceneTwoAnimation : MonoBehaviour
 {
     public GameObject spheresParent;
-    [SerializeField] private GameObject[] sceneTwoSpheres;
+    public Animator animator;
     [SerializeField] private Vector3 centerPosition;
-    [SerializeField] private Animator animator;
-    [SerializeField] private GameObject camera;
-
+    [SerializeField] private GameObject mainCamera;
+    private List<GameObject> sceneTwoSpheres;
     private int nextScene;
+
 
     // Wait a few frames and stay as much as possible out of Awake() and Start() to ensure seamless scene transition.
     void Start()
     {
+        sceneTwoSpheres = Utilities.GetChildren(spheresParent);
         StartCoroutine(ShowSceneTwo());
     }
 
     IEnumerator ShowSceneTwo()
     {
         yield return new WaitForSeconds(1.0f);
-        animator.SetTrigger("Fade In Spheres");  
-    }
-    // Animation Event called at the beginning of the rotation animation.
-    // Only start listening when spheres are rotating.
-    public void StartListeningAfterSpheresFadeIn()
-    {
-        UIController.GetInstance().OnSwitchToScene += OnSwitchScene;
-        camera.GetComponent<PhysicsRaycaster>().enabled = true;
-    }
-    
-    public void OnSwitchScene(int sceneToLoad)
-    {
-        StartCoroutine(SwitchScene(sceneTwoSpheres[0], sceneToLoad));
-        camera.GetComponent<PhysicsRaycaster>().enabled = false;
+        animator.SetTrigger("Fade In Spheres");
+        yield return null;
+        while (Utilities.isPlaying(animator, "Fade In Spheres"))
+        {
+            yield return null;
+        }
+        // Only start listening when spheres are rotating.
+        mainCamera.GetComponent<PhysicsRaycaster>().enabled = true;
+        UIController.GetInstance().animationHasFinished = true;
+
     }
 
-    public IEnumerator SwitchScene(GameObject centerSphere, int sceneToLoad)
+    void OnEnable()
+    {
+        StartCoroutine(LateEnable());
+    }
+
+    IEnumerator LateEnable()
+    {
+        yield return null;
+        UIController.GetInstance().OnSwitchToScene += OnSwitchScene;
+    }
+    void OnDisable()
+    {
+        UIController.GetInstance().OnSwitchToScene -= OnSwitchScene;
+    }
+
+
+    public void OnSwitchScene(int sceneToLoad)
+    {
+        StartCoroutine(SwitchScenes(sceneTwoSpheres[0], sceneToLoad));
+        mainCamera.GetComponent<PhysicsRaycaster>().enabled = false;
+    }
+
+    public IEnumerator SwitchScenes(GameObject centerSphere, int sceneToLoad)
     {
         nextScene = sceneToLoad;
         // Stop animation.
         animator.enabled = false;
         yield return null;
-        for (int i = 0; i < sceneTwoSpheres.Length; i++)
+        for (int i = 0; i < sceneTwoSpheres.Count; i++)
         {
             if(sceneTwoSpheres[i] == centerSphere)
             {
-                StartCoroutine(MoveSphere(sceneTwoSpheres[i], centerPosition, 3.0f));
+                StartCoroutine(Utilities.MoveSphere(sceneTwoSpheres[i], centerPosition, 3.0f));
             }
             else
             {
-                StartCoroutine(FadeOutSphere(sceneTwoSpheres[i], 0.5f));
+                StartCoroutine(Utilities.FadeOutSphere(sceneTwoSpheres[i], 0.5f));
             }
         }
         yield return new WaitForSeconds(4.0f);
         DontDestroyOnLoad(spheresParent);
-       
-        OnFadeComplete();
-        
-    }
 
-    private void OnFadeComplete()
-    {
-        StartCoroutine(UIController.GetInstance().ChangeTimelineUI(1, 2));
-        UIController.GetInstance().OnSwitchToScene -= OnSwitchScene;
         SceneManager.LoadScene(nextScene);
-        StartCoroutine(DisableScript());
+
     }
-
-    IEnumerator DisableScript()
-    {
-        while (SceneManager.GetActiveScene().buildIndex == 1)
-        {
-            yield return null;
-        }
-        this.enabled = false;
-    }
-
-    private IEnumerator MoveSphere(GameObject sphere, Vector3 targetPos, float time)
-    {
-        Vector3 startPos = sphere.transform.position;
-
-        float timer = 0f;
-
-        while (timer < time)
-        {
-            timer += Time.deltaTime;
-            sphere.transform.position = Vector3.Lerp(startPos, targetPos, timer / time);
-            yield return null;
-        }
-        sphere.transform.position = targetPos;
-    }
-
-    private IEnumerator FadeOutSphere(GameObject sphere, float time)
-    {
-        Vector3 originalScale = sphere.transform.localScale;
-        Vector3 destinationScale = new Vector3(0,0,0);
-
-        float timer = 0f;
-
-        while (timer < time)
-        {
-            timer += Time.deltaTime;
-            sphere.transform.localScale = Vector3.Lerp(originalScale, destinationScale, timer / time);
-            yield return null;
-        }
-        sphere.SetActive(false);
-    }
-
-  
 }

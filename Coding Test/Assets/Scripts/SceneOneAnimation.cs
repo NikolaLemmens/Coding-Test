@@ -5,23 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneOneAnimation : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    public Animator animator;
     private int nextScene;
-    /*
-    private UIController _UIControl;
-    private UIController UIControl
-    {
-        get
-        {
-            if (_UIControl == null)
-            {
-                _UIControl = FindObjectOfType<UIController>();
-            }
-            return _UIControl;
-        }
-    }
-    */
-
+  
     // Wait a few frames and stay as much as possible out of Awake() and Start() to ensure seamless scene transition.
     void Start()
     {
@@ -32,12 +18,23 @@ public class SceneOneAnimation : MonoBehaviour
     {
         yield return new WaitForSeconds(1.0f);
         animator.SetTrigger("Fade In Text");
+        yield return null;
+        while (Utilities.isPlaying(animator, "Fade In Text"))
+        {
+            yield return null;
+        }
+        UIController.GetInstance().animationHasFinished = true;
+
     }
 
-    // Animation Event called at the end of the Fade In animation.
-    // Only start listening when Fade In animation is done
-    public void StartListeningToSceneSwitch()
+    void OnEnable()
     {
+        StartCoroutine(LateEnable());
+    }
+
+    IEnumerator LateEnable()
+    {
+        yield return null;
         UIController.GetInstance().OnSwitchToScene += OnSwitchScene;
     }
 
@@ -46,15 +43,20 @@ public class SceneOneAnimation : MonoBehaviour
         UIController.GetInstance().OnSwitchToScene -= OnSwitchScene;
     }
 
+    void OnSwitchScene(int sceneToLoad)
+    {
+        StartCoroutine(SwitchScenes(sceneToLoad));
+    }
 
-    private void OnSwitchScene(int sceneToLoad)
+    IEnumerator SwitchScenes(int sceneToLoad)
     {
         nextScene = sceneToLoad;
         animator.SetTrigger("Fade Out Text");
-    }
-    //Animation Event called at the end of the Fade Out animation
-    public void OnFadeComplete()
-    {
+        yield return null;
+        while (Utilities.isPlaying(animator, "Fade Out Text"))
+        {
+            yield return null;
+        }
         SceneManager.LoadScene(nextScene);
     }
 
@@ -64,5 +66,9 @@ public class SceneOneAnimation : MonoBehaviour
 
 
 
+
+
+
+    
 
 }
