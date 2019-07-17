@@ -74,7 +74,11 @@ public class UIController : MonoBehaviour
 
     public void SwopTimeline()
     {
-        StartCoroutine(TimelineSwop(2, 0));
+        if(lastTimelineSwop == null)
+        {
+            lastTimelineSwop = TimelineSwop(1, 2);
+            StartCoroutine(lastTimelineSwop);
+        }
     }
 
     public IEnumerator TimelineSwop(int currentScene,int nextScene)
