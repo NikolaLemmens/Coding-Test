@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class SceneThreeAnimation : MonoBehaviour
 {
     public GameObject cubesParent;
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animator cubesAnimator;
+    [SerializeField] private Animator buttonAnimator;
     [SerializeField] private Button restartButton;
     private List<GameObject> sceneThreeCubes;
     private int nextScene;
@@ -16,17 +17,23 @@ public class SceneThreeAnimation : MonoBehaviour
     // Wait a few frames and stay as much as possible out of Awake() and Start() to ensure seamless scene transition.
     void Start()
     {
-        sceneThreeCubes = Utilities.GetChildren(cubesParent);
         StartCoroutine(ShowSceneThree());
     }
 
     IEnumerator ShowSceneThree()
     {
+        sceneThreeCubes = Utilities.GetChildren(cubesParent);
         transferredSphere = GameObject.FindGameObjectWithTag("SpheresParent");
         yield return new WaitForSeconds(1.0f);
-        animator.SetTrigger("Fade In Cubes");
+        cubesAnimator.SetTrigger("Fade In Cubes");
         yield return null;
-        while (Utilities.isPlaying(animator, "Fade In Cubes"))
+        while (Utilities.isPlaying(cubesAnimator, "Fade In Cubes"))
+        {
+            yield return null;
+        }
+        buttonAnimator.SetTrigger("Fade In Button");
+        yield return null;
+        while (Utilities.isPlaying(buttonAnimator, "Fade In Button"))
         {
             yield return null;
         }
@@ -61,11 +68,11 @@ public class SceneThreeAnimation : MonoBehaviour
 
     private IEnumerator SwitchScenes(int sceneToLoad)
     {
-      
+        buttonAnimator.SetTrigger("Fade Out Button");
         nextScene = sceneToLoad;
         UIController.GetInstance().StartTimelineSwop(SceneManager.GetActiveScene().buildIndex, nextScene);
         // Stop animation.
-        animator.enabled = false;
+        cubesAnimator.enabled = false;
         yield return null;
         for (int i = 0; i < sceneThreeCubes.Count; i++)
         {
