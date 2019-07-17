@@ -54,31 +54,26 @@ public class UIController : MonoBehaviour
 
         switch (currentSceneIndex)
         {
+            // Scene 1
             case 0:
                 OnSwitchToScene(1);
-                lastTimelineSwop = TimelineSwop(0, 1);
-                StartCoroutine(lastTimelineSwop);
                 break;
+            // Scene 2
             case 1:
                 OnSwitchToScene(2);
-                lastTimelineSwop = TimelineSwop(1, 2);
-                StartCoroutine(lastTimelineSwop);
                 break;
+            // Scene 3
             case 2:
                 OnSwitchToScene(0);
-                lastTimelineSwop = TimelineSwop(2, 0);
-                StartCoroutine(lastTimelineSwop);
                 break;
         }
     }
-
-    public void SwopTimeline()
+    
+    // The 'TimelineSwop' coroutine is called on the 'OnSwitchScene' event via the respective Scene Manager. 
+    public void StartTimelineSwop(int currentScene, int nextScene)
     {
-        if(lastTimelineSwop == null)
-        {
-            lastTimelineSwop = TimelineSwop(1, 2);
-            StartCoroutine(lastTimelineSwop);
-        }
+        lastTimelineSwop = TimelineSwop(currentScene, nextScene);
+        StartCoroutine(lastTimelineSwop);
     }
 
     public IEnumerator TimelineSwop(int currentScene,int nextScene)

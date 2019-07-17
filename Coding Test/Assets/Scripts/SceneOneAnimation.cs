@@ -51,6 +51,7 @@ public class SceneOneAnimation : MonoBehaviour
     IEnumerator SwitchScenes(int sceneToLoad)
     {
         nextScene = sceneToLoad;
+        UIController.GetInstance().StartTimelineSwop(SceneManager.GetActiveScene().buildIndex, nextScene);
         animator.SetTrigger("Fade Out Text");
         yield return null;
         while (Utilities.isPlaying(animator, "Fade Out Text"))

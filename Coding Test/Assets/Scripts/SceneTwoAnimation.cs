@@ -79,6 +79,7 @@ public class SceneTwoAnimation : MonoBehaviour
     {
         mainCamera.GetComponent<PhysicsRaycaster>().enabled = false;
         nextScene = sceneToLoad;
+        UIController.GetInstance().StartTimelineSwop(SceneManager.GetActiveScene().buildIndex, nextScene);
         // Stop animation.
         animator.enabled = false;
         yield return null;
@@ -95,8 +96,6 @@ public class SceneTwoAnimation : MonoBehaviour
         }
         yield return new WaitForSeconds(4.0f);
         DontDestroyOnLoad(spheresParent);
-        // If coroutine is called by clicking on a Sphere, make sure Timeline swops too.
-        UIController.GetInstance().SwopTimeline();
         yield return null;
         SceneManager.LoadScene(nextScene);
     }

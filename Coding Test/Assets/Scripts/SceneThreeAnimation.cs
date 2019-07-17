@@ -32,7 +32,8 @@ public class SceneThreeAnimation : MonoBehaviour
         }
         // Only start listening when cubes are rotating.
         restartButton.onClick.AddListener(() => {
-            OnRestartButtonClick();
+            // Do the same as for clicking on the timeline.
+            UIController.GetInstance().OnTimelineButtonClick();
         });
         UIController.GetInstance().animationHasFinished = true;
 
@@ -58,16 +59,11 @@ public class SceneThreeAnimation : MonoBehaviour
         StartCoroutine(SwitchScenes(sceneToLoad));
     }
 
-    public void OnRestartButtonClick()
-    {
-        StartCoroutine(SwitchScenes(0));
-        UIController.GetInstance().SwopTimeline();
-    }
-
     private IEnumerator SwitchScenes(int sceneToLoad)
     {
       
         nextScene = sceneToLoad;
+        UIController.GetInstance().StartTimelineSwop(SceneManager.GetActiveScene().buildIndex, nextScene);
         // Stop animation.
         animator.enabled = false;
         yield return null;
@@ -80,7 +76,7 @@ public class SceneThreeAnimation : MonoBehaviour
         yield return new WaitForSeconds(4.0f);
       
         Destroy(transferredSphere);
-
+        yield return null;
         SceneManager.LoadScene(nextScene);
     }
     
