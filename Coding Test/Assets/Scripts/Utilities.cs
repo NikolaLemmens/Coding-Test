@@ -39,9 +39,9 @@ public static class Utilities
         sphere.transform.position = targetPos;
     }
 
-    public static IEnumerator FadeOutSphere(GameObject sphere, float time)
+    public static IEnumerator FadeOutGameobject(GameObject go, float time)
     {
-        Vector3 originalScale = sphere.transform.localScale;
+        Vector3 originalScale = go.transform.localScale;
         Vector3 destinationScale = new Vector3(0, 0, 0);
 
         float timer = 0f;
@@ -49,10 +49,9 @@ public static class Utilities
         while (timer < time)
         {
             timer += Time.deltaTime;
-            sphere.transform.localScale = Vector3.Lerp(originalScale, destinationScale, timer / time);
+            go.transform.localScale = Vector3.Lerp(originalScale, destinationScale, timer / time);
             yield return null;
         }
-        sphere.SetActive(false);
+        go.SetActive(false);
     }
-
 }

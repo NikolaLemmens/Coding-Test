@@ -7,12 +7,30 @@ using System.Collections.Generic;
 public class SceneTwoAnimation : MonoBehaviour
 {
     public GameObject spheresParent;
-    public Animator animator;
+    [SerializeField] private Animator animator;
     [SerializeField] private Vector3 centerPosition;
     [SerializeField] private GameObject mainCamera;
     private List<GameObject> sceneTwoSpheres;
     private int nextScene;
 
+    private static SceneTwoAnimation instance;
+    public static SceneTwoAnimation GetInstance()
+    {
+        return instance;
+    }
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     // Wait a few frames and stay as much as possible out of Awake() and Start() to ensure seamless scene transition.
     void Start()
@@ -55,11 +73,11 @@ public class SceneTwoAnimation : MonoBehaviour
     public void OnSwitchScene(int sceneToLoad)
     {
         StartCoroutine(SwitchScenes(sceneTwoSpheres[0], sceneToLoad));
-        mainCamera.GetComponent<PhysicsRaycaster>().enabled = false;
     }
 
     public IEnumerator SwitchScenes(GameObject centerSphere, int sceneToLoad)
     {
+        mainCamera.GetComponent<PhysicsRaycaster>().enabled = false;
         nextScene = sceneToLoad;
         // Stop animation.
         animator.enabled = false;
@@ -72,7 +90,7 @@ public class SceneTwoAnimation : MonoBehaviour
             }
             else
             {
-                StartCoroutine(Utilities.FadeOutSphere(sceneTwoSpheres[i], 0.5f));
+                StartCoroutine(Utilities.FadeOutGameobject(sceneTwoSpheres[i], 0.5f));
             }
         }
         yield return new WaitForSeconds(4.0f);
