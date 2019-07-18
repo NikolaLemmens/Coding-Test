@@ -10,7 +10,7 @@ In ‘Scene-2’ three spheres rotate around each other. The User can select any
 
 ‘Scene-3’ shows the selected Sphere with an additional GameObjects (can be anything) which fades in. A Button allows restarting at ‘Scene-1’. 
 
-![Coding Test Diagram](https://github.com/NikolaLemmens/Coding-Test/CodingTestDiagram.png)
+![Coding Test Diagram](Coding-Test/CodingTestDiagram.png)
 
 Goal: 
 The goal is to show analytical thinking and experience in software architecture.
